@@ -186,10 +186,12 @@ namespace snowcrash {
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const Payload& context,
                                       SectionType sectionType) {
 
             if (!isAbbreviated(sectionType) &&
-                SectionProcessorBase<Payload>::isDescriptionNode(node, sectionType)) {
+                SectionProcessorBase<Payload>::isDescriptionNode(node, siblings, context, sectionType)) {
 
                 return true;
             }
@@ -225,7 +227,7 @@ namespace snowcrash {
                      child != node->children().end();
                      ++child) {
 
-                    nestedType = nestedSectionType(child);
+                    nestedType = nestedSectionType(child, MarkdownNodes(), Payload());
 
                     if (nestedType != UndefinedSectionType) {
                         return getSectionType(signature, nestedType);
@@ -239,7 +241,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const Payload& context) {
 
             SectionType nestedType = UndefinedSectionType;
 

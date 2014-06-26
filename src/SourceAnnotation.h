@@ -125,7 +125,9 @@ namespace snowcrash {
         DeprecatedWarning = 9,
         IndentationWarning = 10,
         AmbiguityWarning = 11,
-        URIWarning = 12
+        URIWarning = 12,
+        SignatureSyntaxWarning = 13,
+        SectionSingletonWarning = 14
     };
     
     /**
