@@ -67,6 +67,8 @@ namespace snowcrash {
         }
         
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const Asset& context,
                                       SectionType sectionType) {
             return false;
         }

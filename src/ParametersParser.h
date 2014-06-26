@@ -106,6 +106,8 @@ namespace snowcrash {
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const Parameters& context,
                                       SectionType sectionType) {
 
             return false;
@@ -129,7 +131,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const Parameters& context) {
 
             return SectionProcessor<Parameter>::sectionType(node);
         }

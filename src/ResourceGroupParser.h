@@ -38,7 +38,7 @@ namespace snowcrash {
                                                      ResourceGroup& out) {
 
             MarkdownNodeIterator cur = node;
-            SectionType nestedType = nestedSectionType(cur);
+            SectionType nestedType = nestedSectionType(cur, MarkdownNodes(), out);
 
             // If starting with Resource directly
             if (nestedType != UndefinedSectionType) {
@@ -142,7 +142,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const ResourceGroup& context) {
 
             // Return ResourceSectionType or UndefinedSectionType
             return SectionProcessor<Resource>::sectionType(node);
@@ -161,6 +163,8 @@ namespace snowcrash {
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const ResourceGroup& context,
                                       SectionType sectionType) {
 
             mdp::ByteBuffer method;
@@ -169,7 +173,7 @@ namespace snowcrash {
                 return false;
             }
 
-            return SectionProcessorBase<ResourceGroup>::isDescriptionNode(node, sectionType);
+            return SectionProcessorBase<ResourceGroup>::isDescriptionNode(node, siblings, context, sectionType);
         }
 
         static bool isUnexpectedNode(const MarkdownNodeIterator& node,

@@ -134,7 +134,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const Parameter& context) {
 
             return SectionProcessor<Values>::sectionType(node);
         }

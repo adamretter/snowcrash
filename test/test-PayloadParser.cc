@@ -501,3 +501,25 @@ TEST_CASE("Parameters section should be taken as a description node", "[payload]
     REQUIRE(payload.description == "+ Parameters\n\n    + id (string)\n");
     REQUIRE(payload.body == "{}\n");
 }
+    
+TEST_CASE("Body section is singleton", "[payload]")
+{
+    // TODO: Revisit behavior of singleton sections
+    mdp::ByteBuffer source = \
+    "+ Response 200\n"\
+    "    + Body\n\n"\
+    "            1\n\n"\
+    "    + Body\n\n"\
+    "            2\n\n";
+    
+    Payload payload;
+    Report report;
+    SectionParserHelper<Payload, PayloadParser>::parse(source, ResponseBodySectionType, report, payload);
+    
+    REQUIRE(report.error.code == Error::OK);
+    REQUIRE(report.warnings.size() == 2);
+    REQUIRE(report.warnings[0].code == SectionSingletonWarning);
+    REQUIRE(report.warnings[1].code == RedefinitionWarning);
+    
+    REQUIRE(payload.body == "2\n");
+}

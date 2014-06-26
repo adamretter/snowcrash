@@ -74,6 +74,8 @@ namespace snowcrash {
         }
 
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const Values& context,
                                       SectionType sectionType) {
 
             return false;
@@ -95,7 +97,9 @@ namespace snowcrash {
             return UndefinedSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const Values& context) {
 
             if (node->type == mdp::ListItemMarkdownNodeType
                 && !node->children().empty()) {

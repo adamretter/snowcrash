@@ -10,6 +10,8 @@
 #define SNOWCRASH_SECTIONPARSER_H
 
 #include <stdexcept>
+#include <algorithm>
+#include <sstream>
 #include "SectionProcessor.h"
 
 #define ADAPTER_MISMATCH_ERR std::logic_error("mismatched adapter and node type")
@@ -21,6 +23,8 @@ namespace snowcrash {
      */
     template<typename T, typename Adapter>
     struct SectionParser {
+        
+        typedef std::vector<SectionType> SiblingsTypes;
         
         /**
          *  \brief  Parse a section of blueprint
@@ -56,7 +60,7 @@ namespace snowcrash {
 
             // Description nodes
             while(cur != collection.end() &&
-                  SectionProcessor<T>::isDescriptionNode(cur, pd.sectionContext())) {
+                  SectionProcessor<T>::isDescriptionNode(cur, collection, out, pd.sectionContext())) {
                 
                 lastCur = cur;
                 cur = SectionProcessor<T>::processDescription(cur, pd, report, out);
@@ -77,10 +81,15 @@ namespace snowcrash {
             SectionType lastSectionType = UndefinedSectionType;
 
             // Nested sections
+            SiblingsTypes siblingsTypes;
+            
             while(cur != collection.end()) {
                 
                 lastCur = cur;
-                SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur);
+                SectionType nestedType = SectionProcessor<T>::nestedSectionType(cur, collection, out);
+
+                validateSectionTraits(cur, nestedType, siblingsTypes, pd, report);
+                siblingsTypes.push_back(nestedType);
                 
                 pd.sectionsContext.push_back(nestedType);
                 
@@ -108,6 +117,30 @@ namespace snowcrash {
             SectionProcessor<T>::finalize(node, pd, report, out);
 
             return Adapter::nextStartingNode(node, siblings, cur);
+        }
+        
+        static void validateSectionTraits(const MarkdownNodeIterator& node,
+                                          SectionType type,
+                                          const SiblingsTypes& siblings,
+                                          const SectionParserData& pd,
+                                          Report& report) {
+            
+            SectionTraits& traits = GetSectionTraits(type);
+            
+            // Verify the section wasn't already defined
+            if (traits.singleton) {
+                SiblingsTypes::const_iterator i = std::find(siblings.begin(), siblings.end(), type);
+                if (i != siblings.end()) {
+                    // WARN: Singleton section already parsed
+                    std::stringstream ss;
+                    ss << "multiple definitons of " << SectionName(type) << " section, ";
+                    ss << "this section should be defined only once";
+                    mdp::CharactersRangeSet sourceMap = mdp::BytesRangeSetToCharactersRangeSet(node->sourceMap, pd.sourceData);
+                    report.warnings.push_back(Warning(ss.str(),
+                                                      SectionSingletonWarning,
+                                                      sourceMap));
+                }
+            }
         }
     };
     

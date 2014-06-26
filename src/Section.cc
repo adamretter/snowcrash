@@ -40,3 +40,31 @@ std::string snowcrash::SectionName(const SectionType& section) {
             return "section";
     }
 }
+
+/** 
+ *  \brief Traits representing a generic singleton section
+ *
+ *  NOTE: Singleton section should be the default in the future.
+ */
+struct SingletonSectionTraits : SectionTraits {
+    SingletonSectionTraits()
+    : SectionTraits(true) {}
+    
+    /** \return Singleton section traits */
+    static SingletonSectionTraits& get() {
+        static SingletonSectionTraits s;
+        return s;
+    }
+};
+
+SectionTraits& snowcrash::GetSectionTraits(const SectionType& section)
+{
+    // TODO: This should be moved to respective section parser
+    switch (section) {
+        case MSONElementsSectionType:
+        case BodySectionType:
+            return SingletonSectionTraits::get();
+        default:
+            return SectionTraits::get();
+    }
+}

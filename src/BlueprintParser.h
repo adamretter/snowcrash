@@ -55,7 +55,7 @@ namespace snowcrash {
 
             if (cur->type == mdp::HeaderMarkdownNodeType) {
 
-                SectionType nestedType = nestedSectionType(cur);
+                SectionType nestedType = nestedSectionType(cur, MarkdownNodes(), out);
 
                 // If starting with Resource or Resource Group
                 if (nestedType != UndefinedSectionType) {
@@ -125,7 +125,9 @@ namespace snowcrash {
             return BlueprintSectionType;
         }
 
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const Blueprint& context) {
 
             SectionType nestedType = UndefinedSectionType;
 

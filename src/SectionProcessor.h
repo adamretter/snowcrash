@@ -124,12 +124,19 @@ namespace snowcrash {
                              T& out) {
         }
         
-        /** \return True if the node is a section description node */
+        /**
+         *  \return True if the node is a section description node
+         *
+         *  TODO: Unify isContentNode() and isUnexpectedNode() to match 
+         *  the isDescriptionNode() signature (siblings & context)
+         */
         static bool isDescriptionNode(const MarkdownNodeIterator& node,
+                                      const MarkdownNodes& siblings,
+                                      const T& context,
                                       SectionType sectionType) {
 
             if (SectionProcessor<T>::isContentNode(node, sectionType) ||
-                SectionProcessor<T>::nestedSectionType(node) != UndefinedSectionType) {
+                SectionProcessor<T>::nestedSectionType(node, siblings, context) != UndefinedSectionType) {
 
                 return false;
             }
@@ -169,13 +176,26 @@ namespace snowcrash {
             return SectionTypes();
         }
 
-        /** \return %SectionType of the node */
+        /** 
+         *  \return %SectionType of the node
+         *
+         *  NOTE: The parent decides based on context whether the a section is
+         *  nested, not the other way around. That mean sectionType() does not need
+         *  other context but actual %sectionType.
+         */
         static SectionType sectionType(const MarkdownNodeIterator& node) {
             return UndefinedSectionType;
         }
         
-        /** \return Nested %SectionType of the node */
-        static SectionType nestedSectionType(const MarkdownNodeIterator& node) {
+        /** 
+         *  \brief Checks whether the node is nested section
+         *  \return Nested %SectionType of the node 
+         *
+         *  NOTE: Parent decides whether a section can be nested. See
+         */
+        static SectionType nestedSectionType(const MarkdownNodeIterator& node,
+                                             const MarkdownNodes& siblings,
+                                             const T& context) {
             return UndefinedSectionType;
         }
     };
